@@ -2,7 +2,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from pypdf import PdfReader
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
@@ -112,4 +112,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
