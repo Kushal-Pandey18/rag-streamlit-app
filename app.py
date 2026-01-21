@@ -1,43 +1,43 @@
 import streamlit as st
-from dotenv import load_dotenv
 from pypdf import PdfReader
-
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.llms import HuggingFaceHub
+from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 
-load_dotenv() 
-# ---------- PDF TEXT ----------
+
 def get_text_from_pdf(pdf_files):
     text = ""
     for pdf in pdf_files:
-        file = PdfReader(pdf)
-        for page in file.pages:
+        reader = PdfReader(pdf)
+        for page in reader.pages:
             text += page.extract_text()
     return text
 
 
-# ---------- CHUNKING ----------
-def chunk_text(raw_text):
+def chunk_text(text):
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
+        chunk_size=500,
+        chunk_overlap=100
     )
-    return splitter.split_text(raw_text)
+    return splitter.split_text(text)
 
 
-
-# ---------- VECTOR STORE ----------
 def get_vectorstore(chunks):
-    embeddings = OpenAIEmbeddings()
-    return FAISS.from_texts(texts=chunks, embedding=embeddings)
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    return FAISS.from_texts(chunks, embeddings)
 
 
-# ---------- CONVERSATION CHAIN ----------
 def get_conversation_chain(vectorstore):
-    llm = ChatOpenAI()
+    llm = HuggingFaceHub(
+        repo_id="google/flan-t5-base",
+        model_kwargs={"temperature": 0.3, "max_length": 512}
+    )
+
     memory = ConversationBufferMemory(
         memory_key="chat_history",
         return_messages=True
@@ -50,36 +50,24 @@ def get_conversation_chain(vectorstore):
     )
 
 
-# ---------- CHAT HANDLER ----------
-def handle_user_input(user_query):
-    response = st.session_state.conversation({"question": user_query})
-    st.write("**Answer:**")
-    st.write(response["answer"])
-
-
-# ---------- MAIN APP ----------
 def main():
-    st.set_page_config(page_title="PDF Chat", page_icon="📚")
-    load_dotenv()
-
-    st.title("📚 PDF Chat App")
+    st.set_page_config(page_title="PDF Chat (FREE)", page_icon="📚")
+    st.title("📚 PDF Chat App (FREE)")
     st.write("Upload PDFs and ask questions")
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
 
-    st.header("Ask your PDF")
-    user_query = st.text_input("Enter your question:")
+    user_question = st.text_input("Ask a question")
 
-    if user_query and st.session_state.conversation:
-        handle_user_input(user_query)
+    if user_question and st.session_state.conversation:
+        response = st.session_state.conversation({"question": user_question})
+        st.write("**Answer:**")
+        st.write(response["answer"])
 
     with st.sidebar:
         st.subheader("Upload PDFs")
-        docs = st.file_uploader(
-            "Upload PDF files",
-            accept_multiple_files=True
-        )
+        docs = st.file_uploader("Upload PDFs", accept_multiple_files=True)
 
         if st.button("Process PDFs"):
             with st.spinner("Processing..."):
@@ -87,11 +75,8 @@ def main():
                 chunks = chunk_text(raw_text)
                 vectorstore = get_vectorstore(chunks)
                 st.session_state.conversation = get_conversation_chain(vectorstore)
-                st.success("PDFs processed successfully!")
+                st.success("Ready to chat!")
 
 
-# ---------- RUN ----------
 if __name__ == "__main__":
     main()
-
-
