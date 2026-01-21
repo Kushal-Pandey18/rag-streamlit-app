@@ -22,12 +22,11 @@ def get_text_from_pdf(pdf_files):
 # ---------- CHUNKING ----------
 def chunk_text(raw_text):
     splitter = RecursiveCharacterTextSplitter(
-        separator="\n",
         chunk_size=1000,
-        chunk_overlap=200,
-        length_function=len
+        chunk_overlap=200
     )
     return splitter.split_text(raw_text)
+
 
 
 # ---------- VECTOR STORE ----------
@@ -94,3 +93,4 @@ def main():
 # ---------- RUN ----------
 if __name__ == "__main__":
     main()
+
