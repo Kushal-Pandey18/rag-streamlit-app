@@ -4,7 +4,6 @@ from pypdf import PdfReader
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.memory import ConversationBufferMemory
 from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
 
 
@@ -112,6 +111,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
