@@ -1,9 +1,8 @@
-streamlit==1.28.0
-openai
-langchain==0.1.16
-langchain-community==0.0.34
-langchain-openai==0.0.8
-faiss-cpu
-pypdf
+streamlit
 python-dotenv
-tiktoken
+pypdf
+faiss-cpu
+sentence-transformers
+langchain
+langchain-community
+huggingface-hub
