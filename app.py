@@ -8,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 
-
+load_dotenv() 
 # ---------- PDF TEXT ----------
 def get_text_from_pdf(pdf_files):
     text = ""
@@ -93,4 +93,5 @@ def main():
 # ---------- RUN ----------
 if __name__ == "__main__":
     main()
+
 
