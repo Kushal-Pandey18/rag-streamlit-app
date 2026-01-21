@@ -6,3 +6,5 @@ sentence-transformers
 langchain
 langchain-community
 huggingface-hub
+
+langchain-text-splitters
