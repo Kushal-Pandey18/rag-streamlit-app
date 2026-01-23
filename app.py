@@ -5,7 +5,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.llms import HuggingFaceHub
-from langchain.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 
 
 # ---------- PDF TEXT ----------
@@ -37,8 +38,8 @@ def get_vectorstore(chunks):
     return FAISS.from_texts(chunks, embeddings)
 
 
-# ---------- QA CHAIN ----------
-def get_conversation_chain(vectorstore):
+# ---------- QA CHAIN (NO RetrievalQA) ----------
+def get_qa_chain(vectorstore):
     llm = HuggingFaceHub(
         repo_id="google/flan-t5-base",
         model_kwargs={
@@ -47,11 +48,28 @@ def get_conversation_chain(vectorstore):
         }
     )
 
-    return RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=vectorstore.as_retriever()
+    retriever = vectorstore.as_retriever()
+
+    prompt = PromptTemplate.from_template(
+        """Use the following context to answer the question.
+If the answer is not in the context, say "I don't know".
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:"""
     )
+
+    chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+    )
+
+    return chain
 
 
 # ---------- MAIN APP ----------
@@ -60,13 +78,13 @@ def main():
     st.title("📚 PDF Chat App (FREE)")
     st.write("Upload PDFs and ask questions")
 
-    if "conversation" not in st.session_state:
-        st.session_state.conversation = None
+    if "qa_chain" not in st.session_state:
+        st.session_state.qa_chain = None
 
     user_question = st.text_input("Ask a question from your PDFs")
 
-    if user_question and st.session_state.conversation:
-        answer = st.session_state.conversation.run(user_question)
+    if user_question and st.session_state.qa_chain:
+        answer = st.session_state.qa_chain.invoke(user_question)
         st.markdown("### ✅ Answer")
         st.write(answer)
 
@@ -87,7 +105,7 @@ def main():
                 raw_text = get_text_from_pdf(docs)
                 chunks = chunk_text(raw_text)
                 vectorstore = get_vectorstore(chunks)
-                st.session_state.conversation = get_conversation_chain(vectorstore)
+                st.session_state.qa_chain = get_qa_chain(vectorstore)
                 st.success("PDFs processed. Ask questions now!")
 
 
