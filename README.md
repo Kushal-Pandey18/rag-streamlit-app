@@ -99,7 +99,7 @@ streamlit run app.py
 
 
 
-##🔐 Environment Variables
+## 🔐 Environment Variables
 The application requires a HuggingFace API token.
 
 Streamlit Secrets
@@ -116,7 +116,7 @@ Multi-language PDF support
 
 Dedicated LLM endpoint for faster responses
 
-##👤 Author
+## 👤 Author
 
 
 Kushal Pandey
