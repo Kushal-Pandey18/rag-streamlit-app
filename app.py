@@ -4,7 +4,7 @@ from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.llms import HuggingFaceHub
+from langchain_community.llms import HuggingFaceEndpoint
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
@@ -38,15 +38,13 @@ def get_vectorstore(chunks):
     return FAISS.from_texts(chunks, embeddings)
 
 
-# ---------- QA CHAIN ----------
+# ---------- QA CHAIN (STABLE) ----------
 def get_qa_chain(vectorstore):
-    llm = HuggingFaceHub(
+    llm = HuggingFaceEndpoint(
         repo_id="google/flan-t5-base",
         huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
-        model_kwargs={
-            "temperature": 0.3,
-            "max_length": 512
-        }
+        temperature=0.3,
+        max_new_tokens=512,
     )
 
     retriever = vectorstore.as_retriever()
