@@ -13,9 +13,8 @@ def get_text_from_pdf(pdf_files):
     for pdf in pdf_files:
         reader = PdfReader(pdf)
         for page in reader.pages:
-            extracted = page.extract_text()
-            if extracted:
-                text += extracted
+            if page.extract_text():
+                text += page.extract_text()
     return text
 
 
@@ -36,7 +35,7 @@ def get_vectorstore(chunks):
     return FAISS.from_texts(chunks, embeddings)
 
 
-# ---------- HF GENERATION (NO LANGCHAIN LLM) ----------
+# ---------- HF REST CALL (NO LANGCHAIN LLM) ----------
 def generate_answer(context, question):
     API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-base"
     headers = {
@@ -44,8 +43,8 @@ def generate_answer(context, question):
     }
 
     prompt = f"""
-Use the following context to answer the question.
-If the answer is not present, say "I don't know".
+Answer the question using the context below.
+If answer is not present, say "I don't know".
 
 Context:
 {context}
@@ -103,4 +102,10 @@ def main():
             with st.spinner("Processing PDFs..."):
                 raw_text = get_text_from_pdf(pdfs)
                 chunks = chunk_text(raw_text)
-                st.session_state.ve_
+                st.session_state.vectorstore = get_vectorstore(chunks)
+
+            st.success("PDFs processed successfully!")
+
+
+if __name__ == "__main__":
+    main()
