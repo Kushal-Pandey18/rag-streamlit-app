@@ -1,11 +1,8 @@
 streamlit
-python-dotenv
 pypdf
 faiss-cpu
 sentence-transformers
 langchain
 langchain-community
-huggingface-hub
-
 langchain-text-splitters
-
+requests
