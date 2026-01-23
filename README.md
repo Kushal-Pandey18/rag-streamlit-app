@@ -91,7 +91,7 @@ This project satisfies the following assessment requirements:
 
 
 ```
-git clone <your-repository-link>
+git clone <https://github.com/Kushal-Pandey18/rag-streamlit-app>
 cd rag-streamlit-app
 pip install -r requirements.txt
 streamlit run app.py
