@@ -88,19 +88,22 @@ This project satisfies the following assessment requirements:
 
 ## 💻 Run Locally (Optional)
 
-```bash
+
+
+```
 git clone <your-repository-link>
 cd rag-streamlit-app
 pip install -r requirements.txt
 streamlit run app.py
+```
+
+
+
 🔐 Environment Variables
 The application requires a HuggingFace API token.
 
 Streamlit Secrets
-toml
-Copy code
 HUGGINGFACEHUB_API_TOKEN = "hf_xxxxxxxxxxxxxxxxxxxxx"
-⚠️ Never commit API keys directly to GitHub.
 
 🔮 Future Enhancements
 Conversational chat history
@@ -117,4 +120,4 @@ Dedicated LLM endpoint for faster responses
 Kushal Pandey
 
 📄 License
-This project is created for educational and assessment purposes.
+This project is created for educational purpose.
