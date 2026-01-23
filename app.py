@@ -62,50 +62,21 @@ Answer:
         timeout=60
     )
 
-    return response.json()[0]["generated_text"]
+    data = response.json()
 
+    # ✅ SAFE HANDLING
+    if isinstance(data, list):
+        return data[0].get("generated_text", "No answer generated.")
 
-# ---------- MAIN ----------
-def main():
-    st.set_page_config(page_title="PDF Chat (FREE)", page_icon="📚")
-    st.title("📚 PDF Chat App (FREE)")
-    st.write("Upload PDFs and ask questions")
+    if isinstance(data, dict):
+        if "error" in data:
+            return f"⚠️ Model loading / busy. Try again in 30 seconds.\n\n{data['error']}"
+        return data.get("generated_text", "No answer generated.")
 
-    if "vectorstore" not in st.session_state:
-        st.session_state.vectorstore = None
+    return "Unexpected response from model."
 
-    user_question = st.text_input("Ask a question from your PDFs")
-
-    if user_question and st.session_state.vectorstore:
-        docs = st.session_state.vectorstore.similarity_search(user_question, k=3)
-        context = "\n".join([d.page_content for d in docs])
-
-        with st.spinner("Generating answer..."):
-            answer = generate_answer(context, user_question)
-
-        st.markdown("### ✅ Answer")
-        st.write(answer)
-
-    with st.sidebar:
-        st.subheader("Upload PDFs")
-        pdfs = st.file_uploader(
-            "Upload PDF files",
-            type=["pdf"],
-            accept_multiple_files=True
-        )
-
-        if st.button("Process PDFs"):
-            if not pdfs:
-                st.warning("Upload at least one PDF")
-                return
-
-            with st.spinner("Processing PDFs..."):
-                raw_text = get_text_from_pdf(pdfs)
-                chunks = chunk_text(raw_text)
-                st.session_state.vectorstore = get_vectorstore(chunks)
-
-            st.success("PDFs processed successfully!")
 
 
 if __name__ == "__main__":
     main()
+
