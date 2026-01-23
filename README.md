@@ -100,9 +100,9 @@ streamlit run app.py
 
 
 ## 🔐 Environment Variables
-The application requires a HuggingFace API token.
-Streamlit Secrets
-HUGGINGFACEHUB_API_TOKEN = "hf_xxxxxxxxxxxxxxxxxxxxx"
+- The application requires a HuggingFace API token.
+- Streamlit Secrets
+- HUGGINGFACEHUB_API_TOKEN = "hf_xxxxxxxxxxxxxxxxxxxxx"
 
 ## 🔮 Future Enhancements
 - Conversational chat history
