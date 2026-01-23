@@ -38,13 +38,13 @@ def get_vectorstore(chunks):
     return FAISS.from_texts(chunks, embeddings)
 
 
-# ---------- QA CHAIN (STABLE) ----------
+# ---------- QA CHAIN ----------
 def get_qa_chain(vectorstore):
     llm = HuggingFaceEndpoint(
         repo_id="google/flan-t5-base",
         huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
         temperature=0.3,
-        max_new_tokens=512,
+        max_new_tokens=512
     )
 
     retriever = vectorstore.as_retriever()
