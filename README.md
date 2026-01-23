@@ -101,25 +101,22 @@ streamlit run app.py
 
 ## 🔐 Environment Variables
 The application requires a HuggingFace API token.
-
 Streamlit Secrets
 HUGGINGFACEHUB_API_TOKEN = "hf_xxxxxxxxxxxxxxxxxxxxx"
 
-##🔮 Future Enhancements
-Conversational chat history
+## 🔮 Future Enhancements
+- Conversational chat history
 
-OCR support for scanned PDFs
+- OCR support for scanned PDFs
 
-Improved answer formatting
+- Improved answer formatting
 
-Multi-language PDF support
+- Multi-language PDF support
 
-Dedicated LLM endpoint for faster responses
+- Dedicated LLM endpoint for faster responses
 
 ## 👤 Author
-
-
 Kushal Pandey
 
-📄 License
+## 📄 License
 This project is created for educational purpose.
