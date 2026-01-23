@@ -38,10 +38,11 @@ def get_vectorstore(chunks):
     return FAISS.from_texts(chunks, embeddings)
 
 
-# ---------- QA CHAIN (NO RetrievalQA) ----------
+# ---------- QA CHAIN ----------
 def get_qa_chain(vectorstore):
     llm = HuggingFaceHub(
         repo_id="google/flan-t5-base",
+        huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
         model_kwargs={
             "temperature": 0.3,
             "max_length": 512
@@ -109,6 +110,5 @@ def main():
                 st.success("PDFs processed. Ask questions now!")
 
 
-# ---------- RUN ----------
 if __name__ == "__main__":
     main()
