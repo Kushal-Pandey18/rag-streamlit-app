@@ -13,7 +13,7 @@ def load_css():
     <style>
     body {
         background-color: #0f172a;
-        color: white;
+        color: Black;
     }
     .chat-user {
         background-color: #1e293b;
@@ -180,3 +180,4 @@ def main():
 # ---------- RUN ----------
 if __name__ == "__main__":
     main()
+
