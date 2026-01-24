@@ -106,10 +106,10 @@ Answer:
 
 # ---------- MAIN ----------
 def main():
-    st.set_page_config(page_title="PDF Chat (FREE)", page_icon="📚")
+    st.set_page_config(page_title="PDF Chat", page_icon="📚")
     load_css()
 
-    st.markdown("<h1 style='color:white;'>📚 PDF Chat App (FREE)</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color:black;'>📚 PDF Chat App </h1>", unsafe_allow_html=True)
     st.write("Upload PDFs and ask questions using HuggingFace LLM")
 
     # Session state
@@ -196,3 +196,4 @@ def main():
 # ---------- RUN ----------
 if __name__ == "__main__":
     main()
+
