@@ -13,7 +13,7 @@ def load_css():
     <style>
     body {
         background-color: #0f172a;
-        color: Black;
+        color: white;
     }
     .chat-user {
         background-color: #1e293b;
@@ -24,11 +24,11 @@ def load_css():
     }
     .chat-bot {
         background-color: #020617;
-        color: #facc15;
+        color: #38bdf8;
         padding: 12px;
         border-radius: 10px;
         margin: 8px 0;
-        border-left: 4px solid #38bdf8;
+        border-left: 4px solid #22c55e;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -64,11 +64,11 @@ def get_vectorstore(chunks):
 
 
 # ---------- HF API CALL ----------
-def generate_answer(context, question):
+def generate_answer(context, question, api_token):
     API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-base"
 
     headers = {
-        "Authorization": f"Bearer {st.secrets['HUGGINGFACEHUB_API_TOKEN']}"
+        "Authorization": f"Bearer {api_token}"
     }
 
     prompt = f"""
@@ -101,10 +101,10 @@ Answer:
             return "⚠️ Model is loading or busy. Please try again in 30 seconds."
         return data.get("generated_text", "No answer generated.")
 
-    return "Unexpected response."
+    return "Unexpected response from model."
 
 
-# ---------- MAIN APP ----------
+# ---------- MAIN ----------
 def main():
     st.set_page_config(page_title="PDF Chat (FREE)", page_icon="📚")
     load_css()
@@ -112,6 +112,7 @@ def main():
     st.markdown("<h1 style='color:white;'>📚 PDF Chat App (FREE)</h1>", unsafe_allow_html=True)
     st.write("Upload PDFs and ask questions using HuggingFace LLM")
 
+    # Session state
     if "vectorstore" not in st.session_state:
         st.session_state.vectorstore = None
 
@@ -120,6 +121,12 @@ def main():
 
     # Sidebar
     with st.sidebar:
+        st.subheader("🔑 HuggingFace API Key")
+        user_api_key = st.text_input("Enter your HuggingFace API key", type="password")
+
+        if not user_api_key:
+            st.info("Using Streamlit secrets if available.")
+
         st.subheader("📂 Upload PDFs")
         docs = st.file_uploader(
             "Upload PDF files",
@@ -144,21 +151,31 @@ def main():
                 st.success("PDFs processed successfully!")
 
         show_chunks = st.checkbox("Show retrieved chunks")
+
         if st.button("🔄 Reset session"):
             st.session_state.vectorstore = None
             st.session_state.chat_history = []
             st.experimental_rerun()
+
+    # Choose API key
+    if user_api_key:
+        api_token = user_api_key
+    else:
+        api_token = st.secrets.get("HUGGINGFACEHUB_API_TOKEN", "")
+
+    if not api_token:
+        st.warning("⚠️ Please enter HuggingFace API key to enable answers.")
+        return
 
     # Chat input
     user_question = st.text_input("Ask a question from your PDFs")
 
     if user_question and st.session_state.vectorstore:
         docs = st.session_state.vectorstore.similarity_search(user_question, k=3)
-
         context = "\n\n".join([d.page_content for d in docs])
 
         with st.spinner("Generating answer..."):
-            answer = generate_answer(context, user_question)
+            answer = generate_answer(context, user_question, api_token)
 
         st.session_state.chat_history.append(("user", user_question))
         st.session_state.chat_history.append(("bot", answer))
@@ -166,7 +183,6 @@ def main():
         if show_chunks:
             st.markdown("### 🔍 Retrieved Chunks")
             for i, d in enumerate(docs):
-                st.write(f"Chunk {i+1}:")
                 st.info(d.page_content)
 
     # Display chat history
@@ -180,4 +196,3 @@ def main():
 # ---------- RUN ----------
 if __name__ == "__main__":
     main()
-
